@@ -1,0 +1,85 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <img src="<%= listing.image?.url || 'https://placehold.co/1200x800?text=No+Image' %>"
+                        class="card-img-top show-img" alt="Listing image">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h3 class="card-title mb-1">
+                                    <%= listing.title %>
+                                </h3>
+                                <p class="text-muted mb-0">
+                                    <%= listing.location %>, <%= listing.country %>
+                                </p>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-semibold">
+                                    <%= Number(listing.price || 0).toLocaleString("en-IN", { style: "currency" ,
+                                        currency: "INR" , maximumFractionDigits: 0 }) %>
+                                </div>
+                                <div class="text-muted small">per night</div>
+                            </div>
+                        </div>
+
+                        <p class="card-text">
+                            <%= listing.description %>
+                        </p>
+
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-outline-secondary" href="/listings">Back</a>
+                            <a class="btn btn-primary" href="/listings/<%= listing._id %>/edit">Edit</a>
+                            <form class="d-inline" action="/listings/<%= listing._id %>?_method=DELETE" method="post">
+                                <button class="btn btn-danger" type="submit">Delete</button>
+                            </form>
+                        </div>
+
+                        <div class="mt-5">
+                            <h4 class="mb-4">Leave a Review</h4>
+                            <form class="needs-validation" novalidate action="/listings/<%= listing.id %>/reviews"
+                                method="POST">
+                                <div class="mb-3">
+                                    <label for="rating" class="form-label">Rating</label>
+                                    <input type="range" min="1" max="5" id="rating" name="review[rating]"
+                                        class="form-range" required>
+                                    <small class="text-muted d-block mt-1">Select a rating from 1 to 5</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="comment" class="form-label">Comments</label>
+                                    <textarea name="review[comment]" id="comment" rows="5" class="form-control"
+                                        placeholder="Share your experience..." required></textarea>
+                                    <div class="invalid-feedback">Please add some comments for review</div>
+                                </div>
+                                <button class="btn btn-primary" type="submit">Submit Review</button>
+                            </form>
+
+                            <hr />
+
+                            <h4>All Reviews</h4>
+                            <div class="row">
+                                <% for(review of listing.reviews){ %>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="card-title mb-0">Pranay</h6>
+                                                    <div class="badge bg-primary"><%= review.rating %> ⭐</div>
+                                                </div>
+                                                <p class="card-text"><%= review.comment %></p>
+                                                <form class="mb-5" method="post" action="/listings/<%= listing._id%>/reviews/<%= review._id%>?_method=DELETE">
+                                                    <button class="btn btn-sm btn-dark">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,39 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <h1 class="card-title text-center mb-4">Log In</h1>
+                    <form action="/login" method="post" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input 
+                                name="username"
+                                id="username"
+                                type="text"
+                                class="form-control"
+                                required
+                            />
+                            <div class="valid-feedback">Looks good!</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input 
+                                name="password"
+                                id="password"
+                                type="password"
+                                class="form-control"
+                                required
+                            />
+                            <div class="valid-feedback">Looks good!</div>
+                        </div>
+                        <button class="btn btn-primary w-100 mb-3">Log In</button>
+                    </form>
+                    <p class="text-center">Don't have an account? <a href="/signup">Sign up</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

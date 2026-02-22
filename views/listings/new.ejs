@@ -1,0 +1,56 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <h3 class="mb-4">Create a New Listing</h3>
+            <form id="newListingForm" method="post" action="/listings/new" class="vstack gap-3" novalidate>
+                <div>
+                    <label class="form-label" for="title">Title</label>
+                    <input class="form-control" id="title" type="text" name="listing[title]" placeholder="Enter title" required>
+                    <div class="invalid-feedback">Please enter a title.</div>
+                </div>
+
+                <div>
+                    <label class="form-label" for="description">Description</label>
+                    <textarea class="form-control" id="description" name="listing[description]" rows="3" placeholder="Enter description" required></textarea>
+                    <div class="invalid-feedback">Please add a short description.</div>
+                </div>
+
+                <div>
+                    <label class="form-label" for="image">Image URL</label>
+                    <input class="form-control" id="image" type="url" name="listing[image]" placeholder="https://...">
+                    <div class="invalid-feedback">Enter a valid image link (or leave blank).</div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="price">Price (per night)</label>
+                        <input class="form-control" id="price" type="number" min="1" step="1" name="listing[price]" placeholder="e.g. 2500" required>
+                        <div class="invalid-feedback">Price must be at least 1.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="country">Country</label>
+                        <input class="form-control" id="country" type="text" name="listing[country]" placeholder="Enter country" required>
+                        <div class="invalid-feedback">Please provide a country.</div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="form-label" for="location">Location</label>
+                        <input class="form-control" id="location" type="text" name="listing[location]" placeholder="City, state" required>
+                        <div class="invalid-feedback">Please enter a location.</div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 pt-2">
+                    <a class="btn btn-outline-secondary" href="/listings">Cancel</a>
+                    <button class="btn btn-primary" type="submit">Add Listing</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Client-side validation disabled; relying on server-side validateListing -->
+<!-- <script src="/js/script.js"></script> -->

@@ -1,0 +1,26 @@
+<% layout("layouts/boilerplate.ejs") %>
+<%= success %>
+
+    <body>
+        <h3>All Listings</h3>
+        <!-- <form action="/listings/new" method="get">
+            <button>Create new listing</button>
+        </form> -->
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <% for(let listing of allListings){ %>
+                <div class="col">
+                    <div class="card h-100 listing-card">
+                        <img src="<%= listing.image?.url || 'https://placehold.co/600x400?text=No+Image' %>" class="card-img-top listing-img" alt="Listing image">
+                        <div class="card-body">
+                            <h5 class="card-title mb-2"><%= listing.title %></h5>
+                            <p class="card-text mb-1">
+                                <%= Number(listing.price || 0).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }) %> / night
+                            </p>
+                            <p class="card-text text-muted small mb-0"><%= listing.location %>, <%= listing.country %></p>
+                            <a class="stretched-link" href="/listings/<%= listing._id %>"></a>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </body>
