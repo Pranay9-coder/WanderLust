@@ -1,4 +1,5 @@
 const { generateTravelPlan } = require("../services/aiService.js");
+const { answerTravelQuestion } = require("../services/assistantService.js");
 
 const createTravelPlan = async (req, res, next) => {
     try {
@@ -10,6 +11,20 @@ const createTravelPlan = async (req, res, next) => {
     }
 };
 
+const answerTravelAssistant = async (req, res, next) => {
+    try {
+        const question = req.body.question || req.body.query || req.body.prompt;
+        const result = await answerTravelQuestion(question);
+        res.status(200).json({
+            success: true,
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createTravelPlan,
+    answerTravelAssistant,
 };

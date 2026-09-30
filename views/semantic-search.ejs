@@ -1,0 +1,7 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+<section class="semantic-page">
+    <div class="semantic-intro"><span class="eyebrow">WanderLust semantic search</span><h1>Search by the feeling you’re <em>looking for.</em></h1><p>Describe a stay naturally. We’ll compare your words with the meaning of each listing—not just exact keywords.</p></div>
+    <form id="semanticSearchForm" class="semantic-form" novalidate><div class="semantic-form__icon"><i class="bi bi-search-heart"></i></div><div class="flex-grow-1"><label class="form-label" for="semanticQuery">What should your stay feel like?</label><textarea id="semanticQuery" name="query" class="form-control" rows="3" minlength="3" maxlength="1000" placeholder="A quiet family escape near the beach with good Wi-Fi and space to relax" required></textarea><div class="semantic-form__hint"><span><i class="bi bi-stars me-1"></i>Natural language works best</span><span id="semanticCharacterCount">0 / 1000</span></div></div><div class="semantic-form__action"><label class="form-label" for="semanticLimit">Results</label><select class="form-select" id="semanticLimit" name="limit"><option value="6">6 stays</option><option value="8" selected>8 stays</option><option value="12">12 stays</option></select><button class="btn btn-primary rounded-pill mt-3" type="submit"><i class="bi bi-search me-2"></i>Search semantically</button></div></form>
+    <section id="semanticResults" class="semantic-results d-none" aria-live="polite"></section>
+</section>

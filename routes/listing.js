@@ -6,7 +6,7 @@ const { listingSchema } = require("../schema.js");
 const Listing = require("../models/listing.js");
 const User = require("../models/user.js");
 const Booking = require("../models/booking.js");
-const { isLoggedIn } = require("../middleware.js");
+const { isLoggedIn, isListingOwner } = require("../middleware.js");
 const { invalidateListingCache } = require("../services/apiService.js");
 
 const normalizeAmenities = (value) => {
@@ -146,7 +146,7 @@ router.post("/new", isLoggedIn, validateListing, wrapAsync(async (req, res) => {
         payload.rating = Number(payload.rating);
     }
 
-    const newListing = new Listing(payload);
+    const newListing = new Listing({ ...payload, owner: req.user._id });
     await newListing.save();
     await invalidateListingCache();
     req.flash("success", "New Listing Created!");
@@ -154,7 +154,7 @@ router.post("/new", isLoggedIn, validateListing, wrapAsync(async (req, res) => {
 }));
 
 // edit route
-router.get("/:id/edit", isLoggedIn, wrapAsync(async (req, res) => {
+router.get("/:id/edit", isLoggedIn, wrapAsync(isListingOwner), wrapAsync(async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
     if (!listing) {
@@ -164,7 +164,7 @@ router.get("/:id/edit", isLoggedIn, wrapAsync(async (req, res) => {
 }));
 
 //update route
-router.put("/:id", isLoggedIn, validateListing, wrapAsync(async (req, res) => {
+router.put("/:id", isLoggedIn, wrapAsync(isListingOwner), validateListing, wrapAsync(async (req, res) => {
     let { id } = req.params;
     const payload = { ...req.body.listing };
 
@@ -262,11 +262,10 @@ router.post("/:id/bookings", isLoggedIn, wrapAsync(async (req, res) => {
 }));
 
 //delete route
-router.delete("/:id", isLoggedIn, wrapAsync(async (req, res) => {
+router.delete("/:id", isLoggedIn, wrapAsync(isListingOwner), wrapAsync(async (req, res) => {
     let { id } = req.params;
     let deletedListing = await Listing.findByIdAndDelete(id);
     await invalidateListingCache();
-    console.log(deletedListing);
     req.flash("success", "Listing Deleted!");
     res.redirect("/listings");
 }));

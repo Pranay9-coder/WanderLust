@@ -36,7 +36,7 @@ const getListing = async (req, res, next) => {
 
 const createListingApi = async (req, res, next) => {
     try {
-        const listing = await createListing(req.body.listing || req.body);
+        const listing = await createListing(req.body.listing || req.body, req.user._id);
         res.status(201).json({ success: true, message: "Listing created", data: listing });
     } catch (error) {
         next(error);

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
-const { createTravelPlan } = require("../controllers/aiController.js");
+const { createTravelPlan, answerTravelAssistant } = require("../controllers/aiController.js");
 
 /**
  * @openapi
@@ -29,5 +29,30 @@ const { createTravelPlan } = require("../controllers/aiController.js");
  *         description: Gemini API key is not configured
  */
 router.post("/travel-plan", wrapAsync(createTravelPlan));
+
+/**
+ * @openapi
+ * /api/ai/travel-assistant:
+ *   post:
+ *     tags: [AI Travel Assistant]
+ *     summary: Answer a travel question using retrieved listing context
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [question]
+ *             properties:
+ *               question:
+ *                 type: string
+ *                 example: Which properties are suitable for a quiet family trip near a beach?
+ *     responses:
+ *       200:
+ *         description: Grounded answer with source listings
+ *       503:
+ *         description: Assistant or embedding service is unavailable
+ */
+router.post("/travel-assistant", wrapAsync(answerTravelAssistant));
 
 module.exports = router;

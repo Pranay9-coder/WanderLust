@@ -113,4 +113,176 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    const recommendationForm = document.querySelector("#recommendationForm");
+    const recommendationResults = document.querySelector("#recommendationResults");
+
+    if (recommendationForm && recommendationResults) {
+        const escapeRecommendationHtml = (value) => String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+        const renderRecommendation = (listing) => {
+            const image = listing.image?.url || "https://placehold.co/900x650/e7efe9/35564a?text=WanderLust";
+            const reasons = listing.matchReasons?.map((reason) => `<span><i class="bi bi-check2"></i>${escapeRecommendationHtml(reason)}</span>`).join("") || "";
+            return `<article class="recommendation-card"><img src="${escapeRecommendationHtml(image)}" alt="${escapeRecommendationHtml(listing.title)}" loading="lazy"><div class="recommendation-card__body"><div class="d-flex justify-content-between gap-2"><div><span class="eyebrow mb-1">${escapeRecommendationHtml(listing.category || "Stay")}</span><h3>${escapeRecommendationHtml(listing.title)}</h3><p class="text-muted small mb-0"><i class="bi bi-geo-alt"></i> ${escapeRecommendationHtml(listing.location)}, ${escapeRecommendationHtml(listing.country)}</p></div><span class="recommendation-score">${escapeRecommendationHtml(listing.matchScore)}% match</span></div><div class="recommendation-card__reasons">${reasons}</div><div class="recommendation-card__footer"><strong>${Number(listing.price || 0).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}<small> / night</small></strong><a class="btn btn-sm btn-dark rounded-pill" href="/listings/${encodeURIComponent(listing._id)}">View stay <i class="bi bi-arrow-up-right ms-1"></i></a></div></div></article>`;
+        };
+
+        recommendationForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const button = recommendationForm.querySelector("button[type='submit']");
+            const formData = new FormData(recommendationForm);
+            const body = Object.fromEntries(formData.entries());
+            button.disabled = true;
+            button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Finding your matches...`;
+            recommendationResults.classList.remove("d-none");
+            recommendationResults.innerHTML = `<div class="text-center py-4"><div class="spinner-border text-success" role="status"></div><p class="text-muted mt-3 mb-0">Comparing stays with your preferences...</p></div>`;
+
+            try {
+                const response = await fetch("/api/recommendations", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body),
+                });
+                const payload = await response.json();
+                if (!response.ok) throw new Error(payload.message || "Recommendations could not be loaded.");
+                recommendationResults.innerHTML = payload.data.length
+                    ? `<div class="recommendation-results__header"><div><span class="eyebrow">Your shortlist</span><h2>${payload.data.length} stays worth a look</h2></div><span class="text-muted small">Ranked from your preferences</span></div><div class="recommendation-card-grid">${payload.data.map(renderRecommendation).join("")}</div>`
+                    : `<div class="empty-state"><i class="bi bi-search"></i><h3>No close matches yet</h3><p>Try broadening your location, budget, or amenity preferences.</p></div>`;
+                recommendationResults.scrollIntoView({ behavior: "smooth", block: "start" });
+            } catch (error) {
+                recommendationResults.innerHTML = `<div class="planner-error"><strong>We couldn’t find recommendations.</strong><p class="mb-0 mt-1">${escapeRecommendationHtml(error.message)}</p></div>`;
+            } finally {
+                button.disabled = false;
+                button.innerHTML = `<i class="bi bi-magic me-2"></i>Find my matches`;
+            }
+        });
+    }
+
+    const semanticForm = document.querySelector("#semanticSearchForm");
+    const semanticResults = document.querySelector("#semanticResults");
+    const semanticQuery = document.querySelector("#semanticQuery");
+    const semanticCharacterCount = document.querySelector("#semanticCharacterCount");
+
+    if (semanticForm && semanticResults && semanticQuery) {
+        const escapeSemanticHtml = (value) => String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+        const updateSemanticCount = () => {
+            semanticCharacterCount.textContent = `${semanticQuery.value.length} / 1000`;
+        };
+
+        const renderSemanticCard = (listing) => {
+            const image = listing.image?.url || "https://placehold.co/900x650/e7efe9/35564a?text=WanderLust";
+            return `<article class="semantic-card"><img src="${escapeSemanticHtml(image)}" alt="${escapeSemanticHtml(listing.title)}" loading="lazy"><div class="semantic-card__body"><div class="d-flex justify-content-between gap-2"><div><span class="eyebrow mb-1">${escapeSemanticHtml(listing.category || "Stay")}</span><h3>${escapeSemanticHtml(listing.title)}</h3><p class="text-muted small mb-0"><i class="bi bi-geo-alt"></i> ${escapeSemanticHtml(listing.location)}, ${escapeSemanticHtml(listing.country)}</p></div><span class="semantic-score">${escapeSemanticHtml(listing.semanticScore)}% relevant</span></div><p class="semantic-card__description">${escapeSemanticHtml(listing.description || "A place to make your own.")}</p><div class="semantic-card__footer"><strong>${Number(listing.price || 0).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}<small> / night</small></strong><a class="btn btn-sm btn-dark rounded-pill" href="/listings/${encodeURIComponent(listing._id)}">View stay <i class="bi bi-arrow-up-right ms-1"></i></a></div></div></article>`;
+        };
+
+        semanticQuery.addEventListener("input", updateSemanticCount);
+        updateSemanticCount();
+
+        semanticForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            if (!semanticForm.checkValidity()) {
+                semanticForm.classList.add("was-validated");
+                return;
+            }
+
+            const button = semanticForm.querySelector("button[type='submit']");
+            const limit = document.querySelector("#semanticLimit").value;
+            button.disabled = true;
+            button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Searching meaning...`;
+            semanticResults.classList.remove("d-none");
+            semanticResults.innerHTML = `<div class="text-center py-4"><div class="spinner-border text-success" role="status"></div><p class="text-muted mt-3 mb-0">Comparing your idea with the listing collection...</p></div>`;
+
+            try {
+                const response = await fetch("/api/search/semantic", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: semanticQuery.value.trim(), limit }),
+                });
+                const payload = await response.json();
+                if (!response.ok) throw new Error(payload.message || "Semantic search could not be completed.");
+                semanticResults.innerHTML = payload.data.length
+                    ? `<div class="semantic-results__header"><div><span class="eyebrow">Meaningful matches</span><h2>${payload.data.length} stays related to your search</h2></div><span class="text-muted small">${escapeSemanticHtml(payload.meta.vectorStore)}</span></div><div class="semantic-card-grid">${payload.data.map(renderSemanticCard).join("")}</div>`
+                    : `<div class="empty-state"><i class="bi bi-search-heart"></i><h3>No semantic matches yet</h3><p>Try describing your destination, mood, activities, or must-have amenities differently.</p></div>`;
+                semanticResults.scrollIntoView({ behavior: "smooth", block: "start" });
+            } catch (error) {
+                semanticResults.innerHTML = `<div class="planner-error"><strong>Semantic search is unavailable.</strong><p class="mb-0 mt-1">${escapeSemanticHtml(error.message)}</p></div>`;
+            } finally {
+                button.disabled = false;
+                button.innerHTML = `<i class="bi bi-search me-2"></i>Search semantically`;
+            }
+        });
+    }
+
+    const assistantForm = document.querySelector("#assistantForm");
+    const assistantResult = document.querySelector("#assistantResult");
+    const assistantQuestion = document.querySelector("#assistantQuestion");
+    const assistantCharacterCount = document.querySelector("#assistantCharacterCount");
+
+    if (assistantForm && assistantResult && assistantQuestion) {
+        const escapeAssistantHtml = (value) => String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+        const updateAssistantCount = () => {
+            assistantCharacterCount.textContent = `${assistantQuestion.value.length} / 1500`;
+        };
+
+        assistantQuestion.addEventListener("input", updateAssistantCount);
+        updateAssistantCount();
+
+        document.querySelectorAll("[data-assistant-example]").forEach((example) => {
+            example.addEventListener("click", () => {
+                assistantQuestion.value = example.dataset.assistantExample;
+                updateAssistantCount();
+                assistantQuestion.focus();
+            });
+        });
+
+        assistantForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            if (!assistantForm.checkValidity()) {
+                assistantForm.classList.add("was-validated");
+                return;
+            }
+
+            const button = assistantForm.querySelector("button[type='submit']");
+            button.disabled = true;
+            button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Searching and thinking...`;
+            assistantResult.classList.remove("d-none");
+            assistantResult.innerHTML = `<div class="text-center py-4"><div class="spinner-border text-success" role="status"></div><p class="text-muted mt-3 mb-0">Retrieving relevant stays before answering...</p></div>`;
+
+            try {
+                const response = await fetch("/api/ai/travel-assistant", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question: assistantQuestion.value.trim() }),
+                });
+                const payload = await response.json();
+                if (!response.ok) throw new Error(payload.message || "The assistant could not answer right now.");
+                const sources = payload.data.sources || [];
+                const sourceMarkup = sources.length
+                    ? `<div class="assistant-sources"><span class="eyebrow">Sources from WanderLust</span><div class="assistant-source-grid">${sources.map((source) => `<a class="assistant-source" href="/listings/${encodeURIComponent(source.id)}"><span><strong>${escapeAssistantHtml(source.title)}</strong><small>${escapeAssistantHtml(source.location)} · ${escapeAssistantHtml(source.pricePerNight)} / night</small></span><i class="bi bi-arrow-up-right"></i></a>`).join("")}</div></div>`
+                    : `<div class="empty-state empty-state--compact"><i class="bi bi-search"></i><p>No matching listing sources were found.</p></div>`;
+                assistantResult.innerHTML = `<div class="assistant-result__header"><div><span class="eyebrow">Grounded answer</span><h2>Here’s what I found.</h2></div><span class="text-muted small">Based on retrieved listings</span></div><div class="assistant-answer">${escapeAssistantHtml(payload.data.answer)}</div>${sourceMarkup}`;
+                assistantResult.scrollIntoView({ behavior: "smooth", block: "start" });
+            } catch (error) {
+                assistantResult.innerHTML = `<div class="planner-error"><strong>We couldn’t answer that yet.</strong><p class="mb-0 mt-1">${escapeAssistantHtml(error.message)}</p></div>`;
+            } finally {
+                button.disabled = false;
+                button.innerHTML = `<i class="bi bi-send me-2"></i>Ask WanderLust`;
+            }
+        });
+    }
 });

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
-const { isLoggedIn } = require("../middleware.js");
+const { isLoggedIn, isListingOwner, validateListingPayload } = require("../middleware.js");
 const {
     listListings,
     getListing,
@@ -64,7 +64,7 @@ router.get("/listings/:id", wrapAsync(getListing));
  *       201:
  *         description: Listing created
  */
-router.post("/listings", isLoggedIn, wrapAsync(createListingApi));
+router.post("/listings", isLoggedIn, validateListingPayload, wrapAsync(createListingApi));
 
 /**
  * @openapi
@@ -76,7 +76,7 @@ router.post("/listings", isLoggedIn, wrapAsync(createListingApi));
  *       200:
  *         description: Listing updated
  */
-router.put("/listings/:id", isLoggedIn, wrapAsync(updateListingApi));
+router.put("/listings/:id", isLoggedIn, wrapAsync(isListingOwner), validateListingPayload, wrapAsync(updateListingApi));
 
 /**
  * @openapi
@@ -88,7 +88,7 @@ router.put("/listings/:id", isLoggedIn, wrapAsync(updateListingApi));
  *       200:
  *         description: Listing deleted
  */
-router.delete("/listings/:id", isLoggedIn, wrapAsync(deleteListingApi));
+router.delete("/listings/:id", isLoggedIn, wrapAsync(isListingOwner), wrapAsync(deleteListingApi));
 
 /**
  * @openapi

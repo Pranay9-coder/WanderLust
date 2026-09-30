@@ -5,18 +5,17 @@ const Booking = require("../models/booking.js");
 const Listing = require("../models/listing.js");
 const wrapAsync = require("../utils/wrapAsync");
 const passport = require("passport");
-const { isLoggedIn } = require("../middleware.js");
+const { isLoggedIn, authLimiter } = require("../middleware.js");
 
 router.get("/signup", (req, res)=>{
     res.render("users/signup.ejs");
 });
 
-router.post("/signup", wrapAsync(async(req, res, next)=>{
+router.post("/signup", authLimiter, wrapAsync(async(req, res, next)=>{
     try {
         let {username, email, password} = req.body;
         const newUser = new User({email, username});
         const registerUser = await User.register(newUser, password);
-        console.log(registerUser);
         req.login(registerUser, (err) => {
             if (err) {
                 return next(err);
@@ -34,7 +33,7 @@ router.get("/login", (req, res) =>{
     res.render("users/login.ejs");
 })
 
-router.post("/login", passport.authenticate("local", {failureRedirect: "/login", failureFlash: true}), (req, res) => {
+router.post("/login", authLimiter, passport.authenticate("local", {failureRedirect: "/login", failureFlash: true}), (req, res) => {
     req.flash("success", "Welcome back to WanderLust");
     const redirectUrl = req.session.redirectUrl || "/listings";
     delete req.session.redirectUrl;

@@ -24,6 +24,11 @@ const ListingSchema = new Schema({
         type: String,
         required: true,
     },
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        index: true,
+    },
     category: {
         type: String,
         default: "General",

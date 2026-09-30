@@ -146,8 +146,11 @@ async function getListingById(id) {
     return Listing.findById(id).populate("reviews");
 }
 
-async function createListing(payload) {
-    const listing = new Listing(buildListingPayload(payload));
+async function createListing(payload, ownerId = null) {
+    const listing = new Listing({
+        ...buildListingPayload(payload),
+        ...(ownerId ? { owner: ownerId } : {}),
+    });
     await listing.save();
     await invalidateListingCache();
     return listing;
