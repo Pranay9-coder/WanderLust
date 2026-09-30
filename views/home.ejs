@@ -1,0 +1,43 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+<section class="home-hero">
+    <div class="home-hero__content">
+        <span class="eyebrow eyebrow--light"><i class="bi bi-compass"></i> Travel, thoughtfully found</span>
+        <h1>Find a stay that feels like <em>your place.</em></h1>
+        <p>Discover memorable homes, quiet escapes, and city stays for every kind of journey.</p>
+        <form action="/listings" method="get" class="hero-search" aria-label="Search destinations">
+            <i class="bi bi-search"></i>
+            <input type="search" name="search" placeholder="Search destinations, locations..." aria-label="Search destinations, locations">
+            <button class="btn btn-primary rounded-pill px-4" type="submit">Explore stays</button>
+        </form>
+        <div class="hero-meta"><span><i class="bi bi-shield-check"></i> Trusted stays</span><span><i class="bi bi-heart"></i> Made for memories</span></div>
+    </div>
+</section>
+
+<section class="home-section">
+    <div class="section-heading">
+        <div><span class="eyebrow">Start exploring</span><h2>Places worth pausing for</h2></div>
+        <a href="/listings" class="text-link">View all listings <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <% if (listings.length) { %>
+        <div class="listing-grid"><% listings.forEach((listing) => { %><%- include("includes/listing-card.ejs", { listing, favoriteIds: new Set() }) %><% }) %></div>
+    <% } else { %>
+        <div class="empty-state"><i class="bi bi-buildings"></i><h3>Your next stay is waiting</h3><p>Be the first to add a memorable place to WanderLust.</p><a href="/listings/new" class="btn btn-primary">Create a listing</a></div>
+    <% } %>
+</section>
+
+<section class="home-section home-section--muted">
+    <div class="section-heading"><div><span class="eyebrow">Travel your way</span><h2>Find your kind of escape</h2></div></div>
+    <div class="category-grid">
+        <% if (categories.length) { categories.forEach((category) => { %>
+            <a class="category-tile" href="/listings?category=<%= encodeURIComponent(category) %>"><span><i class="bi bi-stars"></i></span><strong><%= category %></strong><small>Explore stays</small><i class="bi bi-arrow-up-right"></i></a>
+        <% }) } else { %>
+            <div class="empty-state empty-state--compact"><i class="bi bi-map"></i><p>Categories will appear as listings are added.</p></div>
+        <% } %>
+    </div>
+</section>
+
+<section class="planner-promo">
+    <div><span class="eyebrow">Plan with a little magic</span><h2>Your next journey, beautifully planned.</h2><p>Tell us where you want to go, and get a thoughtful day-by-day itinerary.</p><a href="/planner" class="btn btn-dark rounded-pill">Try the AI planner <i class="bi bi-arrow-up-right ms-1"></i></a></div>
+    <span class="planner-promo__icon"><i class="bi bi-stars"></i></span>
+</section>

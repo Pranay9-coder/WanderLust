@@ -1,0 +1,24 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+<section class="planner-page">
+    <div class="planner-intro">
+        <span class="eyebrow">WanderLust AI</span>
+        <h1>Turn a daydream into a <em>travel plan.</em></h1>
+        <p>Share your destination, dates, budget, and travel style. We’ll shape it into a practical day-by-day itinerary.</p>
+    </div>
+
+    <div class="planner-layout">
+        <form id="travelPlannerForm" class="planner-form" novalidate>
+            <div class="planner-form__header"><span class="planner-form__icon"><i class="bi bi-stars"></i></span><div><h2>Tell us about your trip</h2><p>More detail means a more useful plan.</p></div></div>
+            <label class="form-label" for="travelPrompt">Your travel brief</label>
+            <textarea id="travelPrompt" name="prompt" class="form-control planner-textarea" minlength="10" maxlength="3000" placeholder="Plan a 5-day trip to Goa for 2 people under ₹20,000. I prefer beaches, nightlife and budget hotels." required></textarea>
+            <div class="planner-form__hint"><span><i class="bi bi-lightbulb me-1"></i> Try destination + duration + budget + interests</span><span id="plannerCharacterCount">0 / 3000</span></div>
+            <button class="btn btn-primary btn-lg rounded-pill w-100 mt-4" type="submit"><i class="bi bi-stars me-2"></i>Generate my itinerary</button>
+            <p class="planner-disclaimer"><i class="bi bi-info-circle me-1"></i> AI suggestions are estimates. Confirm live prices, opening hours, and travel requirements before booking.</p>
+        </form>
+
+        <aside class="planner-aside"><span class="eyebrow">A thoughtful starting point</span><h2>Good plans leave room for wonder.</h2><div class="planner-aside__steps"><div><span>1</span><p><strong>Share your brief</strong><small>Tell us what matters to you.</small></p></div><div><span>2</span><p><strong>Get a daily rhythm</strong><small>Activities, places, budget, and tips.</small></p></div><div><span>3</span><p><strong>Make it yours</strong><small>Adjust the plan as your trip takes shape.</small></p></div></div></aside>
+    </div>
+
+    <section id="plannerResult" class="planner-result d-none" aria-live="polite"></section>
+</section>

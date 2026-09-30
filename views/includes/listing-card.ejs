@@ -1,0 +1,22 @@
+<article class="listing-card h-100">
+    <div class="listing-card__media">
+        <img src="<%= listing.image?.url || 'https://placehold.co/900x650/e7efe9/35564a?text=WanderLust' %>" alt="<%= listing.title %>" loading="lazy">
+        <% if (listing.category) { %><span class="listing-card__tag"><%= listing.category %></span><% } %>
+        <% if (typeof favoriteIds !== 'undefined' && favoriteIds.has(String(listing._id))) { %>
+            <span class="listing-card__saved"><i class="bi bi-heart-fill"></i> Saved</span>
+        <% } %>
+    </div>
+    <div class="listing-card__body">
+        <div class="d-flex justify-content-between gap-3 align-items-start">
+            <div>
+                <h3 class="listing-card__title"><%= listing.title %></h3>
+                <p class="listing-card__location"><i class="bi bi-geo-alt"></i> <%= listing.location %>, <%= listing.country %></p>
+            </div>
+            <% if (listing.rating) { %><span class="rating-pill"><i class="bi bi-star-fill"></i> <%= listing.rating %></span><% } %>
+        </div>
+        <div class="listing-card__footer">
+            <p class="listing-card__price mb-0"><%= Number(listing.price || 0).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }) %> <small>/ night</small></p>
+            <a class="btn btn-sm btn-dark rounded-pill px-3" href="/listings/<%= listing._id %>">View details <i class="bi bi-arrow-up-right ms-1"></i></a>
+        </div>
+    </div>
+</article>

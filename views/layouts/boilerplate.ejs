@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WanderLust</title>
+    <title><%= typeof title !== 'undefined' ? title + ' · WanderLust' : 'WanderLust · Stay curious' %></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
         integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -16,7 +16,7 @@
 
 <body class="d-flex flex-column min-vh-100">
     <%- include("../includes/navbar.ejs") %>
-        <main class="container flex-grow-1">
+        <main class="flex-grow-1">
             <%- include("../includes/flash.ejs") %>
             <%- body %>
         </main>

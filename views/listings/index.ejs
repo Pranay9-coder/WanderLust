@@ -1,26 +1,25 @@
 <% layout("layouts/boilerplate.ejs") %>
-<%= success %>
 
-    <body>
-        <h3>All Listings</h3>
-        <!-- <form action="/listings/new" method="get">
-            <button>Create new listing</button>
-        </form> -->
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            <% for(let listing of allListings){ %>
-                <div class="col">
-                    <div class="card h-100 listing-card">
-                        <img src="<%= listing.image?.url || 'https://placehold.co/600x400?text=No+Image' %>" class="card-img-top listing-img" alt="Listing image">
-                        <div class="card-body">
-                            <h5 class="card-title mb-2"><%= listing.title %></h5>
-                            <p class="card-text mb-1">
-                                <%= Number(listing.price || 0).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }) %> / night
-                            </p>
-                            <p class="card-text text-muted small mb-0"><%= listing.location %>, <%= listing.country %></p>
-                            <a class="stretched-link" href="/listings/<%= listing._id %>"></a>
-                        </div>
-                    </div>
-                </div>
-            <% } %>
-        </div>
-    </body>
+<section class="page-header"><div><span class="eyebrow">Find your next chapter</span><h1>Explore stays</h1><p>Search places that make the journey worth taking.</p></div><% if (currentUser) { %><a href="/listings/new" class="btn btn-primary rounded-pill"><i class="bi bi-plus-lg me-2"></i>Create listing</a><% } %></section>
+
+<form method="get" action="/listings" class="filter-panel">
+    <div class="filter-panel__header"><div><span class="eyebrow mb-0">Refine your search</span><strong>What are you looking for?</strong></div><a href="/listings" class="text-link">Reset filters <i class="bi bi-arrow-counterclockwise"></i></a></div>
+    <div class="row g-3">
+        <div class="col-12 col-lg-4"><label for="search">Search</label><div class="input-group"><span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search"></i></span><input class="form-control border-start-0" id="search" type="search" name="search" placeholder="Title, city, country..." value="<%= filters.search || '' %>"></div></div>
+        <div class="col-6 col-lg-2"><label for="location">Location</label><input class="form-control" id="location" type="text" name="location" placeholder="Goa" value="<%= filters.location || '' %>"></div>
+        <div class="col-6 col-lg-2"><label for="country">Country</label><input class="form-control" id="country" type="text" name="country" placeholder="India" value="<%= filters.country || '' %>"></div>
+        <div class="col-6 col-lg-2"><label for="category">Category</label><select class="form-select" id="category" name="category"><option value="">All stays</option><% ['Beach','City','Mountain','Villa','Budget','Luxury','Nature'].forEach((category) => { %><option value="<%= category %>" <%= filters.category === category ? 'selected' : '' %>><%= category %></option><% }) %></select></div>
+        <div class="col-6 col-lg-2"><label for="rating">Rating ≥</label><input class="form-control" id="rating" type="number" min="0" max="5" step="0.5" name="rating" placeholder="4.5" value="<%= filters.rating || '' %>"></div>
+        <div class="col-6 col-lg-2"><label for="minPrice">Min price</label><input class="form-control" id="minPrice" type="text" inputmode="numeric" pattern="[0-9]*" data-integer-only name="minPrice" placeholder="₹ 1,000" value="<%= filters.minPrice || '' %>"></div>
+        <div class="col-6 col-lg-2"><label for="maxPrice">Max price</label><input class="form-control" id="maxPrice" type="text" inputmode="numeric" pattern="[0-9]*" data-integer-only name="maxPrice" placeholder="₹ 20,000" value="<%= filters.maxPrice || '' %>"></div>
+        <div class="col-12 col-lg-5"><label for="amenities">Amenities</label><input class="form-control" id="amenities" type="text" name="amenities" placeholder="Wi-Fi, Pool, Parking" value="<%= filters.amenities || '' %>"></div>
+        <div class="col-12 col-lg-3 d-grid align-self-end"><button class="btn btn-dark" type="submit"><i class="bi bi-sliders me-2"></i>Apply filters</button></div>
+    </div>
+</form>
+
+<div class="results-meta"><p><strong><%= allListings.length %></strong> stays found<% if (filters.search || filters.location || filters.category) { %> for your search<% } %></p><span class="text-muted small"><i class="bi bi-lightning-charge"></i> Curated for curious travelers</span></div>
+<div class="listing-results">
+    <% if (allListings.length === 0) { %><div class="empty-state"><i class="bi bi-search"></i><h3>No listings found</h3><p>Try changing your search or filters to discover more stays.</p><a href="/listings" class="btn btn-outline-dark rounded-pill">Clear all filters</a></div><% } else { %>
+        <div class="listing-grid"><% allListings.forEach((listing) => { %><%- include("../includes/listing-card.ejs", { listing, favoriteIds }) %><% }) %></div>
+    <% } %>
+</div>

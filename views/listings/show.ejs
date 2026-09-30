@@ -1,85 +1,16 @@
 <% layout("layouts/boilerplate.ejs") %>
 
-    <div class="container py-4">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card">
-                    <img src="<%= listing.image?.url || 'https://placehold.co/1200x800?text=No+Image' %>"
-                        class="card-img-top show-img" alt="Listing image">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <div>
-                                <h3 class="card-title mb-1">
-                                    <%= listing.title %>
-                                </h3>
-                                <p class="text-muted mb-0">
-                                    <%= listing.location %>, <%= listing.country %>
-                                </p>
-                            </div>
-                            <div class="text-end">
-                                <div class="fw-semibold">
-                                    <%= Number(listing.price || 0).toLocaleString("en-IN", { style: "currency" ,
-                                        currency: "INR" , maximumFractionDigits: 0 }) %>
-                                </div>
-                                <div class="text-muted small">per night</div>
-                            </div>
-                        </div>
-
-                        <p class="card-text">
-                            <%= listing.description %>
-                        </p>
-
-                        <div class="d-flex gap-2">
-                            <a class="btn btn-outline-secondary" href="/listings">Back</a>
-                            <a class="btn btn-primary" href="/listings/<%= listing._id %>/edit">Edit</a>
-                            <form class="d-inline" action="/listings/<%= listing._id %>?_method=DELETE" method="post">
-                                <button class="btn btn-danger" type="submit">Delete</button>
-                            </form>
-                        </div>
-
-                        <div class="mt-5">
-                            <h4 class="mb-4">Leave a Review</h4>
-                            <form class="needs-validation" novalidate action="/listings/<%= listing.id %>/reviews"
-                                method="POST">
-                                <div class="mb-3">
-                                    <label for="rating" class="form-label">Rating</label>
-                                    <input type="range" min="1" max="5" id="rating" name="review[rating]"
-                                        class="form-range" required>
-                                    <small class="text-muted d-block mt-1">Select a rating from 1 to 5</small>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="comment" class="form-label">Comments</label>
-                                    <textarea name="review[comment]" id="comment" rows="5" class="form-control"
-                                        placeholder="Share your experience..." required></textarea>
-                                    <div class="invalid-feedback">Please add some comments for review</div>
-                                </div>
-                                <button class="btn btn-primary" type="submit">Submit Review</button>
-                            </form>
-
-                            <hr />
-
-                            <h4>All Reviews</h4>
-                            <div class="row">
-                                <% for(review of listing.reviews){ %>
-                                    <div class="col-md-6 mb-3">
-                                        <div class="card h-100">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <h6 class="card-title mb-0">Pranay</h6>
-                                                    <div class="badge bg-primary"><%= review.rating %> ⭐</div>
-                                                </div>
-                                                <p class="card-text"><%= review.comment %></p>
-                                                <form class="mb-5" method="post" action="/listings/<%= listing._id%>/reviews/<%= review._id%>?_method=DELETE">
-                                                    <button class="btn btn-sm btn-dark">Delete</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <% } %>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="detail-wrap">
+    <a href="/listings" class="text-link d-inline-block mb-3"><i class="bi bi-arrow-left me-1"></i> Back to explore</a>
+    <article class="detail-card">
+        <img src="<%= listing.image?.url || 'https://placehold.co/1400x800/e7efe9/35564a?text=WanderLust' %>" class="detail-hero" alt="<%= listing.title %>">
+        <div class="detail-body">
+            <div class="detail-heading"><div><span class="eyebrow"><%= listing.category || 'A special stay' %></span><h1><%= listing.title %></h1><p class="detail-location"><i class="bi bi-geo-alt-fill text-danger"></i> <%= listing.location %>, <%= listing.country %> <% if (listing.rating) { %><span class="rating-pill ms-2"><i class="bi bi-star-fill"></i> <%= listing.rating %> / 5</span><% } %></p></div><div class="detail-price"><%= Number(listing.price || 0).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }) %> <small>/ night</small></div></div>
+            <div class="d-flex flex-wrap gap-2 mt-4"><% if (currentUser) { %><form action="/listings/<%= listing._id %>/favorite" method="post"><button class="btn <%= favorite ? 'btn-primary' : 'btn-outline-dark' %> rounded-pill" type="submit"><i class="bi bi-heart<%= favorite ? '-fill' : '' %> me-2"></i><%= favorite ? 'Saved to favorites' : 'Save favorite' %></button></form><a class="btn btn-outline-secondary rounded-pill" href="/listings/<%= listing._id %>/edit"><i class="bi bi-pencil me-2"></i>Edit listing</a><form action="/listings/<%= listing._id %>?_method=DELETE" method="post"><button class="btn btn-outline-danger rounded-pill" type="submit"><i class="bi bi-trash me-2"></i>Delete</button></form><% } %></div>
+            <section class="detail-section"><span class="eyebrow">About this stay</span><p class="lead fs-6 lh-lg"><%= listing.description || 'A welcoming place to slow down, settle in, and make the most of your journey.' %></p></section>
+            <section class="detail-section"><span class="eyebrow">Included with your stay</span><h2 class="h4">Amenities</h2><% if (listing.amenities?.length) { %><ul class="amenity-list"><% listing.amenities.forEach((amenity) => { %><li><i class="bi bi-check2-circle me-1"></i><%= amenity %></li><% }) %></ul><% } else { %><p class="text-muted">The host hasn’t listed amenities yet.</p><% } %></section>
+            <section class="detail-section booking-card"><div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3"><div><span class="eyebrow">Plan your stay</span><h2 class="h4 mb-0">Book this listing</h2></div><i class="bi bi-calendar-heart fs-2 text-success"></i></div><% if (currentUser) { %><form action="/listings/<%= listing._id %>/bookings" method="POST" class="row g-3 align-items-end"><div class="col-md-5"><label class="form-label" for="checkIn">Check-in</label><input class="form-control" type="date" id="checkIn" name="booking[checkIn]" required></div><div class="col-md-5"><label class="form-label" for="checkOut">Check-out</label><input class="form-control" type="date" id="checkOut" name="booking[checkOut]" required></div><div class="col-md-2 d-grid"><button class="btn btn-primary" type="submit" data-loading-text="Creating booking..."><i class="bi bi-check2 me-1"></i>Book</button></div></form><% } else { %><p class="mb-0">Log in to save this stay or make a booking. <a class="text-link" href="/login">Log in <i class="bi bi-arrow-right"></i></a></p><% } %></section>
+            <section class="detail-section"><div class="d-flex justify-content-between align-items-center flex-wrap gap-2"><div><span class="eyebrow">Guestbook</span><h2 class="h4">Reviews <span class="text-muted fw-normal">(<%= listing.reviews.length %>)</span></h2></div></div><% if (currentUser) { %><form class="form-card p-0 border-0 shadow-none bg-transparent mb-4 needs-validation" novalidate action="/listings/<%= listing.id %>/reviews" method="POST"><div class="row g-3"><div class="col-md-3"><label for="rating" class="form-label">Your rating</label><input type="range" min="1" max="5" id="rating" name="review[rating]" class="form-range" required><div class="small text-muted">1 — 5 stars</div></div><div class="col-md-7"><label for="comment" class="form-label">Share your experience</label><textarea name="review[comment]" id="comment" rows="2" class="form-control" placeholder="What made this stay memorable?" required></textarea></div><div class="col-md-2 d-grid align-self-end"><button class="btn btn-dark" type="submit">Post review</button></div></div></form><% } %><% if (listing.reviews.length) { %><div class="row g-3"><% listing.reviews.forEach((review) => { %><div class="col-md-6"><div class="review-card"><div class="d-flex justify-content-between align-items-center mb-2"><div><span class="review-card__avatar">W</span><strong>Wanderer</strong></div><span class="rating-pill"><i class="bi bi-star-fill"></i> <%= review.rating %></span></div><p class="mb-3"><%= review.comment %></p><% if (currentUser) { %><form method="post" action="/listings/<%= listing._id%>/reviews/<%= review._id%>?_method=DELETE"><button class="btn btn-sm btn-link text-danger p-0" type="submit">Delete review</button></form><% } %></div></div><% }) %></div><% } else { %><div class="empty-state empty-state--compact"><i class="bi bi-chat-heart"></i><p>No reviews yet. Be the first to share a stay story.</p></div><% } %></section>
         </div>
-    </div>
+    </article>
+</div>

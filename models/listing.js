@@ -12,14 +12,39 @@ const ListingSchema = new Schema({
         url: String,
         filename: String,
     },
-    price: Number,
-    location: String,
-    country: String,
-    reviews: [
-    {
-        type: Schema.Types.ObjectId,
-        ref: "Review",
+    price: {
+        type: Number,
+        required: true,
     },
+    location: {
+        type: String,
+        required: true,
+    },
+    country: {
+        type: String,
+        required: true,
+    },
+    category: {
+        type: String,
+        default: "General",
+    },
+    rating: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 5,
+    },
+    amenities: [
+        {
+            type: String,
+            trim: true,
+        },
+    ],
+    reviews: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Review",
+        },
     ],
 });
 
